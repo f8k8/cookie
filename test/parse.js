@@ -59,21 +59,21 @@ describe('cookie.parse(str, options)', function () {
     })
   })
 })
-test('dates', function() {
+describe('dates', function() {
   assert.deepEqual({ priority: 'true', Path: '/', expires: 'Wed, 29 Jan 2014 17:43:25 GMT' },
     cookie.parse('priority=true; expires=Wed, 29 Jan 2014 17:43:25 GMT; Path=/',{
       decode: function(value) { return value; }
     }));
 });
 
-test('missing value', function() {
+describe('missing value', function() {
   assert.deepEqual({ bar: '1', fizz: '', buzz: '2' },
     cookie.parse('foo; bar=1; fizz= ; buzz=2',{
       decode: function(value) { return value; }
     }));
 });
 
-test('assign only once', function() {
+describe('assign only once', function() {
   assert.deepEqual({ foo: '%1', bar: 'bar' },
     cookie.parse('foo=%1;bar=bar;foo=boo'));
   assert.deepEqual({ foo: 'false', bar: 'bar' },
@@ -82,27 +82,27 @@ test('assign only once', function() {
     cookie.parse('foo=;bar=bar;foo=boo'));
 });
 
-test('multiValuedCookies flag', function () {
+describe('multiValuedCookies flag', function () {
   assert.deepEqual(
-    { foo: ["%1", "boo"], bar: "bar" },
+    { foo: ["%1", "boo"], bar: ["bar"] },
     cookie.parse("foo=%1;bar=bar;foo=boo", {
       multiValuedCookies: true
     })
   );
   assert.deepEqual(
-    { foo: ["", "boo"], bar: "bar" },
+    { foo: ["", "boo"], bar: ["bar"] },
     cookie.parse("foo=;bar=bar;foo=boo", {
       multiValuedCookies: true,
     })
   );
   assert.deepEqual(
-    { foo: ["%1", "boo", "bar"], bar: "bar" },
+    { foo: ["%1", "boo", "bar"], bar: ["bar"] },
     cookie.parse("foo=%1;bar=bar;foo=boo;foo=bar", {
       multiValuedCookies: true,
     })
   );
   assert.deepEqual(
-    { foo: "%1", bar: "bar" },
+    { foo: ["%1"], bar: ["bar"] },
     cookie.parse("foo=%1;bar=bar", {
       multiValuedCookies: true,
     })
