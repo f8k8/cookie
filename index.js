@@ -36,7 +36,7 @@ var fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
  * Parse a cookie header.
  *
  * Parse the given cookie header string into an object
- * The object has the various cookies as keys(names) => values
+ * The object has the various cookies as keys(names) => values or array of values
  *
  * @param {string} str
  * @param {object} [options]
@@ -49,44 +49,53 @@ function parse(str, options) {
     throw new TypeError('argument str must be a string');
   }
 
-  var obj = {}
+  var obj = {};
   var opt = options || {};
   var dec = opt.decode || decode;
 
-  var index = 0
+  var index = 0;
   while (index < str.length) {
-    var eqIdx = str.indexOf('=', index)
+    var eqIdx = str.indexOf('=', index);
 
     // no more cookie pairs
     if (eqIdx === -1) {
-      break
+      break;
     }
 
-    var endIdx = str.indexOf(';', index)
+    var endIdx = str.indexOf(';', index);
 
     if (endIdx === -1) {
-      endIdx = str.length
+      endIdx = str.length;
     } else if (endIdx < eqIdx) {
       // backtrack on prior semicolon
-      index = str.lastIndexOf(';', eqIdx - 1) + 1
-      continue
+      index = str.lastIndexOf(';', eqIdx - 1) + 1;
+      continue;
     }
 
-    var key = str.slice(index, eqIdx).trim()
+    var key = str.slice(index, eqIdx).trim();
 
-    // only assign once
-    if (undefined === obj[key]) {
-      var val = str.slice(eqIdx + 1, endIdx).trim()
+    // only assign once unless multiValuedCookies is true
+    if (undefined === obj[key] || opt.multiValuedCookies) {
+      var val = str.slice(eqIdx + 1, endIdx).trim();
 
       // quoted values
       if (val.charCodeAt(0) === 0x22) {
-        val = val.slice(1, -1)
+        val = val.slice(1, -1);
       }
 
-      obj[key] = tryDecode(val, dec);
+      var decoded = tryDecode(val, dec);
+      if (opt.multiValuedCookies) {
+        if (obj[key]) {
+          obj[key].push(decoded);
+        } else {
+          obj[key] = [decoded];
+        }
+      } else {
+        obj[key] = decoded;
+      }
     }
 
-    index = endIdx + 1
+    index = endIdx + 1;
   }
 
   return obj;

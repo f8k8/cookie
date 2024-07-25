@@ -1,3 +1,10 @@
+
+
+unreleased
+==================
+
+  * Add support for reading multiple cookies with same name
+    - This feature can be turned on by `multiValuedCookies` flag
 0.6.0 / 2023-11-06
 ==================
 
